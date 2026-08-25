@@ -21,17 +21,30 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.cattracker.database.DatabaseProvider
 import java.time.Instant
 import java.time.ZoneId
 
 @Composable
 fun InsulinScreen(
-    viewModel: InsulinClassViewModel = viewModel(),
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+
+    val database = remember {
+        DatabaseProvider.getDatabase(context)
+    }
+
+    val dao = database.insulinReadingsDao()
+
+    val viewModel: InsulinClassViewModel = viewModel {
+        InsulinClassViewModel(dao)
+    }
+
     var showDatePicker by remember { mutableStateOf(false) }
     val datePicked = viewModel.selectedDate.collectAsState().value
     val textFieldState = rememberTextFieldState("")
