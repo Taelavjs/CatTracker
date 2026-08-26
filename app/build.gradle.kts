@@ -50,7 +50,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.compose.material.icons.extended)
-
+    implementation(libs.ycharts)
     implementation(libs.androidx.room3.runtime)
     ksp(libs.androidx.room3.compiler)
     testImplementation(libs.junit)
