@@ -1,13 +1,10 @@
 package com.example.cattracker.graphing.line_graph
 
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import co.yml.charts.axis.AxisData
 import co.yml.charts.common.model.Point
@@ -21,60 +18,113 @@ import co.yml.charts.ui.linechart.model.LineStyle
 import co.yml.charts.ui.linechart.model.SelectionHighlightPoint
 import co.yml.charts.ui.linechart.model.SelectionHighlightPopUp
 import co.yml.charts.ui.linechart.model.ShadowUnderLine
+import com.example.cattracker.graphing.InsulinData
 
-@Preview
+private const val HOURS_IN_DAY = 24f
+private const val X_STEPS = 6
+private const val Y_MAX = 30f
+private const val Y_STEPS = 6
+
+private fun timeToX(
+    hour: Int,
+    minute: Int
+): Float {
+    val hourOfDay = hour + minute / 60f
+
+    return hourOfDay / (HOURS_IN_DAY / X_STEPS)
+}
+
 @Composable
-fun PlotLineGraph(){
-    val pointsData: List<Point> =
-        listOf(Point(0f, 40f), Point(1f, 90f), Point(2f, 0f), Point(3f, 60f), Point(4f, 10f), Point(11f, 5f))
-
-    val xSteps = 12
+fun PlotLineGraph(
+    pointsData: List<Point>
+) {
+    if(pointsData.isEmpty()) return
 
     val xAxisData = AxisData.Builder()
-        .steps(xSteps)
-        .axisStepSize(25.dp)
+        .steps(X_STEPS)
+        .axisStepSize(55.dp)
         .labelData { i ->
-            val hour = i * 24f / xSteps
-            String.format("%02.0f", hour)
+            "%02d:00".format(i * 4)
         }
-        .labelAndAxisLinePadding(15.dp)
+        .labelAndAxisLinePadding(10.dp)
+        .shouldDrawAxisLineTillEnd(true)
         .build()
 
-
-    val steps : Int = 6;
     val yAxisData = AxisData.Builder()
-        .steps(steps)
+        .steps(Y_STEPS)
+        .labelAndAxisLinePadding(15.dp)
         .shouldDrawAxisLineTillEnd(true)
-        .labelAndAxisLinePadding(20.dp)
         .labelData { i ->
-            val yScale = 30f / steps
-            String.format("%.1f", i * yScale)
-        }.build()
+            "%.1f".format(i * (Y_MAX / Y_STEPS))
+        }
+        .build()
+
+    val boundsLine = Line(
+        dataPoints = listOf(
+            Point(0f, 0f),
+            Point(X_STEPS.toFloat(), Y_MAX)
+        ),
+        lineStyle = LineStyle(
+            color = Color.Transparent
+        ),
+        intersectionPoint = IntersectionPoint(
+            color = Color.Transparent
+        ),
+        selectionHighlightPoint = SelectionHighlightPoint(
+            color = Color.Transparent
+        ),
+        shadowUnderLine = ShadowUnderLine(
+            alpha = 0f
+        ),
+        selectionHighlightPopUp = SelectionHighlightPopUp()
+    )
+
+    val insulinLine = Line(
+        dataPoints = pointsData,
+        lineStyle = LineStyle(),
+        intersectionPoint = IntersectionPoint(),
+        selectionHighlightPoint = SelectionHighlightPoint(),
+        shadowUnderLine = ShadowUnderLine(),
+        selectionHighlightPopUp = SelectionHighlightPopUp()
+    )
 
     val lineChartData = LineChartData(
         linePlotData = LinePlotData(
             lines = listOf(
-                Line(
-                    dataPoints = pointsData,
-                    LineStyle(),
-                    IntersectionPoint(),
-                    SelectionHighlightPoint(),
-                    ShadowUnderLine(),
-                    SelectionHighlightPopUp()
-                )
+                boundsLine,
+                insulinLine
             )
         ),
         xAxisData = xAxisData,
         yAxisData = yAxisData,
         gridLines = GridLines(),
-        backgroundColor = Color.White
+        backgroundColor = Color.Transparent
     )
-
 
     LineChart(
         modifier = Modifier
             .fillMaxWidth()
-            .height(300.dp),
+            .fillMaxHeight(),
         lineChartData = lineChartData
+    )
+}
+
+@Composable
+fun TransformInsulinReadingsIntoPoints(
+    insulinReadings: List<InsulinData>
+) {
+    val readingGraphPoints = insulinReadings.map { reading ->
+        Point(
+            x = timeToX(
+                hour = reading.time.hour,
+                minute = reading.time.minute
+            ),
+            y = reading.insulinReading
+        )
+    }
+
+
+    PlotLineGraph(
+        pointsData = readingGraphPoints
     )
 }

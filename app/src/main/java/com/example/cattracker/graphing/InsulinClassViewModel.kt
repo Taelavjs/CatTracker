@@ -19,7 +19,8 @@ import java.time.LocalTime
 data class InsulinData(
     val insulinReading : Float,
     val date : LocalDate,
-    val time : LocalTime
+    val time : LocalTime,
+    val id : Int
 )
 
 class InsulinClassViewModel(
@@ -31,6 +32,14 @@ class InsulinClassViewModel(
 
     val selectedDate: StateFlow<LocalDate> =
         _selectedDate.asStateFlow()
+    private val _readingInput = MutableStateFlow("")
+
+    var readingInput : StateFlow<String> =
+        _readingInput.asStateFlow()
+
+    fun onReadingInputChanged(value: String) {
+        _readingInput.value = value
+    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val selectedDateReadings: StateFlow<List<InsulinData>> =
@@ -43,7 +52,8 @@ class InsulinClassViewModel(
                     InsulinData(
                         insulinReading = reading.insulinReading,
                         date = reading.dateRecorded,
-                        time = reading.timeRecorded
+                        time = reading.timeRecorded,
+                        id = reading.id
                     )
                 }
             }
@@ -65,6 +75,14 @@ class InsulinClassViewModel(
                     timeRecorded = LocalTime.now(),
                     dateRecorded = LocalDate.now()
                 )
+            )
+        }
+    }
+
+    fun deleteInsulinReading(id: Int) {
+        viewModelScope.launch {
+            dao.deleteById(
+                id
             )
         }
     }

@@ -18,7 +18,8 @@ import java.time.format.DateTimeFormatter
 fun InsulinReadingsView(
     modifier: Modifier = Modifier,
     insulinReadings: List<InsulinData>,
-    datePicked: LocalDate?
+    datePicked: LocalDate?,
+    deleteById : (id : Int) -> Unit
 ) {
     LazyColumn(
         modifier = modifier
@@ -41,7 +42,7 @@ fun InsulinReadingsView(
             HorizontalDivider(thickness = 2.dp)
         }
         items(insulinReadings) { reading ->
-            InsulinReading(data = reading)
+            InsulinReading(data = reading, deleteReading = deleteById)
         }
     }
 }

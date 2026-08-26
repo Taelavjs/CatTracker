@@ -22,4 +22,7 @@ interface InsulinReadingsDao {
                 "ORDER BY timeRecorded"
     )
     fun getReadingsForDate(date: LocalDate): Flow<List<InsulinReadings>>
+
+    @Query("DELETE FROM insulin_readings WHERE id = :id")
+    suspend fun deleteById(id: Int)
 }
