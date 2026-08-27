@@ -38,7 +38,7 @@ private fun timeToX(
 fun PlotLineGraph(
     pointsData: List<Point>
 ) {
-    if(pointsData.isEmpty()) return
+    if (pointsData.isEmpty()) return
 
     val xAxisData = AxisData.Builder()
         .steps(X_STEPS)
@@ -84,15 +84,35 @@ fun PlotLineGraph(
         lineStyle = LineStyle(),
         intersectionPoint = IntersectionPoint(),
         selectionHighlightPoint = SelectionHighlightPoint(),
-        shadowUnderLine = ShadowUnderLine(),
+        shadowUnderLine = ShadowUnderLine(
+            alpha = 0f
+        ),
         selectionHighlightPopUp = SelectionHighlightPopUp()
+    )
+
+    val highReadingsLine = FilterPointsColourValue(
+        pointsData = pointsData,
+        comparisonFunction = { yValue : Float ->
+            yValue > 13f
+        },
+        color = Color.Blue
+    )
+
+    val lowReadingsLine = FilterPointsColourValue(
+        pointsData = pointsData,
+        comparisonFunction = { yValue : Float ->
+            yValue <= 3f
+        },
+        color = Color.Red
     )
 
     val lineChartData = LineChartData(
         linePlotData = LinePlotData(
             lines = listOf(
                 boundsLine,
-                insulinLine
+                insulinLine,
+                highReadingsLine,
+                lowReadingsLine
             )
         ),
         xAxisData = xAxisData,
@@ -127,4 +147,28 @@ fun TransformInsulinReadingsIntoPoints(
     PlotLineGraph(
         pointsData = readingGraphPoints
     )
+}
+
+fun FilterPointsColourValue(
+    pointsData: List<Point>,
+    comparisonFunction: (Float) -> Boolean,
+    color: Color
+): Line {
+    return Line(
+        dataPoints = pointsData.filter { comparisonFunction(it.y) },
+        lineStyle = LineStyle(
+            color = color
+        ),
+        intersectionPoint = IntersectionPoint(
+            color = color
+        ),
+        selectionHighlightPoint = SelectionHighlightPoint(
+            color = color
+        ),
+        shadowUnderLine = ShadowUnderLine(
+            alpha = 0f
+        ),
+        selectionHighlightPopUp = SelectionHighlightPopUp()
+    )
+
 }

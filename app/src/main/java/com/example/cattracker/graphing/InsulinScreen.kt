@@ -16,7 +16,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+
+import com.example.cattracker.database.catsRegistered.CatsRegistered
 import com.example.cattracker.graphing.line_graph.TransformInsulinReadingsIntoPoints
 import java.time.Instant
 import java.time.ZoneId
@@ -27,13 +30,16 @@ fun InsulinScreen(
     viewModel: InsulinClassViewModel,
     showInsulinTextReadings: Boolean,
     showAddInsulinDialog: Boolean,
-    onShowAddInsulinDialogChange: (Boolean) -> Unit
+    onShowAddInsulinDialogChange: (Boolean) -> Unit,
+    activeCat: CatsRegistered
 ) {
     var showDatePicker by remember { mutableStateOf(false) }
     val datePicked by  viewModel.selectedDate.collectAsStateWithLifecycle()
     val textFieldState =  rememberTextFieldState("")
-    val readings by viewModel.selectedDateReadings
-        .collectAsStateWithLifecycle()
+    val readings by viewModel
+        .getReadingsForCat(activeCat.id)
+        .collectAsState(initial = emptyList())
+
 
     Column(
         modifier = modifier.fillMaxSize()
@@ -58,6 +64,8 @@ fun InsulinScreen(
                     insulinReadings = readings,
                     datePicked = datePicked,
                     deleteById = viewModel::deleteInsulinReading,
+                    editReading = viewModel::updateInsulinReading,
+                    activeCat = activeCat
                 )
             }
 
@@ -91,7 +99,7 @@ fun InsulinScreen(
     if (showAddInsulinDialog) {
         DialogInsulinInput(
             addInsulinReading = { reading ->
-                viewModel.addInsulinReading(reading)
+                viewModel.addInsulinReading(reading, activeCat.id)
             },
             textFieldState = textFieldState,
             hideInsulinDialog = {

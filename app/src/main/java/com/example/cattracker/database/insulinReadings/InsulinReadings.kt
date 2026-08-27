@@ -7,12 +7,24 @@ import androidx.room3.Entity
 import androidx.room3.PrimaryKey
 import java.time.LocalDate
 import java.time.LocalTime
+import androidx.room3.ForeignKey
+import com.example.cattracker.database.catsRegistered.CatsRegistered
 
-@Entity(tableName = "insulin_readings")
-@ColumnTypeConverters(DateTimeConverters::class)
+@Entity(
+    tableName = "insulin_readings",
+    foreignKeys = [
+        ForeignKey(
+            entity = CatsRegistered::class,
+            parentColumns = ["id"],
+            childColumns = ["catId"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ]
+)@ColumnTypeConverters(DateTimeConverters::class)
 data class InsulinReadings(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
+    val catId: Int,
     var insulinReading: Float,
     var timeRecorded: LocalTime,
     var dateRecorded: LocalDate

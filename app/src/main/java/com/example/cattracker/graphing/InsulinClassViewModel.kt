@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.cattracker.database.insulinReadings.InsulinReadings
 import com.example.cattracker.database.insulinreadings.InsulinReadingsDao
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -41,11 +42,32 @@ class InsulinClassViewModel(
         _readingInput.value = value
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val selectedDateReadings: StateFlow<List<InsulinData>> =
+//    @OptIn(ExperimentalCoroutinesApi::class)
+//    val selectedDateReadings: StateFlow<List<InsulinData>> =
+//        selectedDate
+//            .flatMapLatest { date ->
+//                dao.getReadingsForDate(date, catId)
+//            }
+//            .map { readings ->
+//                readings.map { reading ->
+//                    InsulinData(
+//                        insulinReading = reading.insulinReading,
+//                        date = reading.dateRecorded,
+//                        time = reading.timeRecorded,
+//                        id = reading.id
+//                    )
+//                }
+//            }
+//            .stateIn(
+//                viewModelScope,
+//                SharingStarted.WhileSubscribed(5_000),
+//                emptyList()
+//            )
+
+    fun getReadingsForCat(catId: Int): Flow<List<InsulinData>> =
         selectedDate
             .flatMapLatest { date ->
-                dao.getReadingsForDate(date)
+                dao.getReadingsForDate(date, catId)
             }
             .map { readings ->
                 readings.map { reading ->
@@ -57,32 +79,37 @@ class InsulinClassViewModel(
                     )
                 }
             }
-            .stateIn(
-                viewModelScope,
-                SharingStarted.WhileSubscribed(5_000),
-                emptyList()
-            )
+
 
     fun setDate(date: LocalDate) {
         _selectedDate.value = date
     }
 
-    fun addInsulinReading(reading: Float) {
+    fun addInsulinReading(reading: Float, catId : Int) {
         viewModelScope.launch {
             dao.insert(
                 InsulinReadings(
                     insulinReading = reading,
                     timeRecorded = LocalTime.now(),
-                    dateRecorded = LocalDate.now()
+                    dateRecorded = LocalDate.now(),
+                    catId = catId
                 )
             )
         }
     }
 
-    fun deleteInsulinReading(id: Int) {
+    fun deleteInsulinReading(reading: InsulinReadings) {
         viewModelScope.launch {
-            dao.deleteById(
-                id
+            dao.delete(
+                reading
+            )
+        }
+    }
+
+    fun updateInsulinReading(insulinReadings: InsulinReadings){
+        viewModelScope.launch {
+            dao.update (
+                insulinReadings
             )
         }
     }

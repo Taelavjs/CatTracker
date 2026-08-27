@@ -11,6 +11,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import com.example.cattracker.database.catsRegistered.CatsRegistered
+import com.example.cattracker.database.insulinReadings.InsulinReadings
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -19,7 +21,9 @@ fun InsulinReadingsView(
     modifier: Modifier = Modifier,
     insulinReadings: List<InsulinData>,
     datePicked: LocalDate?,
-    deleteById : (id : Int) -> Unit
+    deleteById: (reading: InsulinReadings) -> Unit,
+    editReading: (reading: InsulinReadings) -> Unit,
+    activeCat: CatsRegistered
 ) {
     LazyColumn(
         modifier = modifier
@@ -42,7 +46,10 @@ fun InsulinReadingsView(
             HorizontalDivider(thickness = 2.dp)
         }
         items(insulinReadings) { reading ->
-            InsulinReading(data = reading, deleteReading = deleteById)
+            InsulinReading(data = reading,
+                deleteReading = deleteById,
+                updateInsulinReading = editReading,
+                activeCat = activeCat)
         }
     }
 }
