@@ -3,7 +3,6 @@ package com.example.cattracker.database.catsRegistered
 import androidx.room3.Dao
 import androidx.room3.Insert
 import androidx.room3.Query
-import com.example.cattracker.database.insulinReadings.InsulinReadings
 import kotlinx.coroutines.flow.Flow
 
 @Dao

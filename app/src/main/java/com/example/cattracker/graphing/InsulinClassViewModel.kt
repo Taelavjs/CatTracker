@@ -7,12 +7,10 @@ import com.example.cattracker.database.insulinreadings.InsulinReadingsDao
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalTime
@@ -64,6 +62,7 @@ class InsulinClassViewModel(
 //                emptyList()
 //            )
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     fun getReadingsForCat(catId: Int): Flow<List<InsulinData>> =
         selectedDate
             .flatMapLatest { date ->

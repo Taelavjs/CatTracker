@@ -113,7 +113,7 @@ fun PlotLineGraph(
                 insulinLine,
                 highReadingsLine,
                 lowReadingsLine
-            )
+            ).filter { it.dataPoints.isNotEmpty() }
         ),
         xAxisData = xAxisData,
         yAxisData = yAxisData,
