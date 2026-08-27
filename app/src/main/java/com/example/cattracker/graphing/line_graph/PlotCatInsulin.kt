@@ -117,7 +117,10 @@ fun PlotLineGraph(
         ),
         xAxisData = xAxisData,
         yAxisData = yAxisData,
-        gridLines = GridLines(),
+        gridLines = GridLines(
+            enableVerticalLines = false,
+            enableHorizontalLines =  false
+        ),
         backgroundColor = Color.Transparent
     )
 
