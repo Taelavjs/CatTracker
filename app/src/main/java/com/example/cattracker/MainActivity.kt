@@ -12,12 +12,15 @@ class MainActivity : ComponentActivity() {
         val database = DatabaseProvider.getDatabase(applicationContext)
         val insulinPageDao = database.insulinReadingsDao()
         val catRegisterDao = database.catsRegisteredDao()
-
+        val catRegisteredDao = database.catsRegisteredDao()
+        val catFoodDao = database.catFoodDao()
 
         setContent {
             CatApp(
                 insulinPageDao = insulinPageDao,
-                catRegisterDao = catRegisterDao
+                catRegisterDao = catRegisterDao,
+                catRegisteredDao = catRegisterDao,
+                catFoodDao = catFoodDao
             )
         }
     }
