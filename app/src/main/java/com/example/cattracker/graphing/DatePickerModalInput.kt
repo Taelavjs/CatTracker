@@ -17,7 +17,8 @@ import androidx.compose.ui.unit.dp
 import java.time.LocalDate
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
-
+import androidx.compose.material3.SelectableDates
+import java.time.Instant
 @Composable
 fun DatePickerModalInput(
     selectedDate: LocalDate,
@@ -31,8 +32,23 @@ fun DatePickerModalInput(
 
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = initialMillis,
-        initialDisplayMode = DisplayMode.Input
+        initialDisplayMode = DisplayMode.Input,
+        selectableDates = object : SelectableDates {
+
+            override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                val selectedDate = Instant.ofEpochMilli(utcTimeMillis)
+                    .atZone(ZoneOffset.UTC)
+                    .toLocalDate()
+
+                return !selectedDate.isAfter(LocalDate.now())
+            }
+
+            override fun isSelectableYear(year: Int): Boolean {
+                return year <= LocalDate.now().year
+            }
+        }
     )
+
     DatePickerDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
@@ -81,7 +97,7 @@ fun DatePickerButtons(
         ) {
             Text(
                 text = datePicked.format(
-                    DateTimeFormatter.ofPattern("dd MMM yyyy")
+                    DateTimeFormatter.ofPattern("dd MM yyyy")
                 )
             )
         }
@@ -90,7 +106,8 @@ fun DatePickerButtons(
             onClick = {
                 setDate(datePicked.plusDays(1))
             },
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
+            enabled = !(datePicked >= LocalDate.now())
         ) {
             Text(">")
         }
